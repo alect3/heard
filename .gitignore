@@ -6,6 +6,7 @@ __pycache__/
 dist/
 build/
 .pytest_cache/
+.ruff_cache/
 
 # local config (ship config.example.toml instead)
 /config.toml

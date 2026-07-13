@@ -21,6 +21,10 @@ dev = ["pytest>=8", "ruff>=0.6", "black>=24"]
 requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
 
+# Flat layout: the `heard` package sits at the repo root, not under src/.
+[tool.uv.build-backend]
+module-root = ""
+
 [tool.black]
 target-version = ["py314"]
 
@@ -28,5 +32,4 @@ target-version = ["py314"]
 target-version = "py314"
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
 testpaths = ["tests"]
