@@ -1,0 +1,42 @@
+# heard client config. Copy to ~/.config/heard/config.toml (or point
+# $HEARD_CONFIG at it). Every field is optional; defaults are shown.
+
+# Where the speaches STT server lives.
+endpoint = "http://127.0.0.1:8083/v1/audio/transcriptions"
+
+# Any faster-whisper / CTranslate2 HF repo id. The turbo build keeps short-clip
+# dictation snappy on CPU; swap to Systran/faster-whisper-large-v3 for accuracy.
+model = "deepdml/faster-whisper-large-v3-turbo-ct2"
+language = "en"
+
+# Press Enter after typing the transcript.
+submit = true
+
+# GLOBAL vocabulary bias (Whisper initial_prompt, ~224 tokens) — terms you say
+# across ALL projects. Keep it to genuinely-everywhere terms; filler causes the
+# decoder to echo/hallucinate. Project- and on-screen-specific jargon comes from
+# [context] at runtime, so it does NOT belong here.
+prompt = """
+Technical dictation. Common terms: herdr, heard, niri, Wayland, alacritty,
+Salt, SaltStack, salt-call, pillar, formula, minion, podman, systemd,
+Kubernetes, kubectl, k3s, nftables, WireGuard, SSH, git, GitHub, PR, repo,
+commit, rebase, worktree, refactor, Claude, z20, x299, rome, carbon.
+"""
+
+# Space-separated global boost terms, always merged ahead of on-screen ones.
+hotwords = ""
+
+[context]
+# Read the focused herdr pane and bias the transcript toward what's on screen.
+# A graceful no-op outside herdr or if the herdr CLI is unavailable.
+enabled = true
+# "visible" (the viewport you're looking at), "recent", or "recent-unwrapped".
+source = "visible"
+# How much of the pane to scan (rows).
+lines = 200
+# Max on-screen terms promoted to Whisper hotwords (term-boost).
+max_hotwords = 48
+# On-screen terms appended to the initial_prompt (kept small to avoid echoing).
+prompt_terms = 24
+# Trust a keydown-prefetched bias cache younger than this (seconds).
+cache_ttl = 8.0
