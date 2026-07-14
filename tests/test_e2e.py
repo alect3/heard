@@ -66,6 +66,25 @@ def test_request_carries_model_and_language(harness):
     assert 'name="language"' in body and "en" in body
 
 
+def test_request_carries_decode_knobs(harness):
+    """vad_filter and temperature are sent explicitly, defaulting off/0.0 so
+    the server's own defaults can't drift under us."""
+    harness.run("transcribe", str(harness.make_wav()))
+    body = harness.stt.last_body()
+    assert 'name="vad_filter"' in body and "false" in body
+    assert 'name="temperature"' in body and "0.0" in body
+
+
+def test_vad_filter_can_be_enabled(harness):
+    harness.run(
+        "transcribe",
+        str(harness.make_wav()),
+        extra_env={"HEARD_VAD_FILTER": "true"},
+    )
+    body = harness.stt.last_body()
+    assert 'name="vad_filter"' in body and "true" in body
+
+
 # --- the headline feature: on-screen vocabulary bias ----------------------
 
 

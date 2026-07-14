@@ -54,6 +54,13 @@ def post(cfg: Config, audio: Path) -> str:
         data["prompt"] = bias.prompt
     if bias.hotwords:
         data["hotwords"] = bias.hotwords
+    # Decode knobs the OpenAI-compatible endpoint accepts per request. Sent
+    # explicitly so the server's own defaults can't drift under us. vad_filter
+    # runs Silero VAD before decoding — it drops non-speech spans, which curbs
+    # the repetition/early-stop that otherwise truncates a clip to its first
+    # few words on pausey speech.
+    data["vad_filter"] = "true" if cfg.vad_filter else "false"
+    data["temperature"] = str(cfg.temperature)
     with audio.open("rb") as fh:
         resp = httpx.post(
             cfg.endpoint,

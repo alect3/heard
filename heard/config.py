@@ -64,6 +64,12 @@ class Config:
     prompt: str = ""
     # Space-separated global boost terms, always merged ahead of on-screen ones.
     hotwords: str = ""
+    # Decode knobs forwarded to the STT endpoint per request. vad_filter gates
+    # Silero VAD before decoding (drops non-speech, curbs repetition/early-stop
+    # on pausey clips); temperature is the decode temperature. Defaults match
+    # the server so an unset config is a no-op.
+    vad_filter: bool = False
+    temperature: float = 0.0
     context: ContextConfig = field(default_factory=ContextConfig)
 
 
@@ -126,6 +132,13 @@ def apply_env(cfg: Config) -> Config:
         top["prompt"] = env["HEARD_PROMPT"]
     if "HEARD_HOTWORDS" in env:
         top["hotwords"] = env["HEARD_HOTWORDS"]
+    if "HEARD_VAD_FILTER" in env:
+        top["vad_filter"] = as_bool(env["HEARD_VAD_FILTER"], cfg.vad_filter)
+    if "HEARD_TEMPERATURE" in env:
+        try:
+            top["temperature"] = float(env["HEARD_TEMPERATURE"])
+        except ValueError:
+            pass
     if top:
         cfg = replace(cfg, **top)
 
